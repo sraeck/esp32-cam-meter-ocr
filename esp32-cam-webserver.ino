@@ -415,22 +415,22 @@ void StartCamera() {
         * https://github.com/espressif/esp32-camera/blob/master/driver/include/sensor.h#L149
         */
 
-        //s->set_framesize(s, FRAMESIZE_SVGA); // FRAMESIZE_[QQVGA|HQVGA|QVGA|CIF|VGA|SVGA|XGA|SXGA|UXGA|QXGA(ov3660)]);
-        //s->set_quality(s, val);       // 10 to 63
+        s->set_framesize(s, FRAMESIZE_SVGA); // FRAMESIZE_[QQVGA|HQVGA|QVGA|CIF|VGA|SVGA|XGA|SXGA|UXGA|QXGA(ov3660)]);
+        s->set_quality(s, 35);       // 10 to 63 ----> lower value is higher quality! <----
         //s->set_brightness(s, 0);      // -2 to 2
         //s->set_contrast(s, 0);        // -2 to 2
         //s->set_saturation(s, 0);      // -2 to 2
-        //s->set_special_effect(s, 0);  // 0 to 6 (0 - No Effect, 1 - Negative, 2 - Grayscale, 3 - Red Tint, 4 - Green Tint, 5 - Blue Tint, 6 - Sepia)
-        //s->set_whitebal(s, 1);        // aka 'awb' in the UI; 0 = disable , 1 = enable
-        //s->set_awb_gain(s, 1);        // 0 = disable , 1 = enable
-        //s->set_wb_mode(s, 0);         // 0 to 4 - if awb_gain enabled (0 - Auto, 1 - Sunny, 2 - Cloudy, 3 - Office, 4 - Home)
-        //s->set_exposure_ctrl(s, 1);   // 0 = disable , 1 = enable
-        //s->set_aec2(s, 0);            // 0 = disable , 1 = enable
-        //s->set_ae_level(s, 0);        // -2 to 2
-        //s->set_aec_value(s, 300);     // 0 to 1200
-        //s->set_gain_ctrl(s, 1);       // 0 = disable , 1 = enable
-        //s->set_agc_gain(s, 0);        // 0 to 30
-        //s->set_gainceiling(s, (gainceiling_t)0);  // 0 to 6
+        s->set_special_effect(s, 2);  // 0 to 6 (0 - No Effect, 1 - Negative, 2 - Grayscale, 3 - Red Tint, 4 - Green Tint, 5 - Blue Tint, 6 - Sepia)
+        s->set_whitebal(s, 0);        // aka 'awb' in the UI; 0 = disable , 1 = enable
+        s->set_awb_gain(s, 1);        // 0 = disable , 1 = enable
+        s->set_wb_mode(s, 0);         // 0 to 4 - if awb_gain enabled (0 - Auto, 1 - Sunny, 2 - Cloudy, 3 - Office, 4 - Home)
+        s->set_exposure_ctrl(s, 0);   // 0 = disable , 1 = enable
+        s->set_aec2(s, 0);            // 0 = disable , 1 = enable
+        s->set_ae_level(s, 0);        // -2 to 2
+        s->set_aec_value(s, 29);     // 0 to 1200
+        s->set_gain_ctrl(s, 0);       // 0 = disable , 1 = enable
+        s->set_agc_gain(s, 0);        // 0 to 30
+        s->set_gainceiling(s, (gainceiling_t)0);  // 0 to 6
         //s->set_bpc(s, 0);             // 0 = disable , 1 = enable
         //s->set_wpc(s, 1);             // 0 = disable , 1 = enable
         //s->set_raw_gma(s, 1);         // 0 = disable , 1 = enable
@@ -439,6 +439,15 @@ void StartCamera() {
         //s->set_vflip(s, 0);           // 0 = disable , 1 = enable
         //s->set_dcw(s, 1);             // 0 = disable , 1 = enable
         //s->set_colorbar(s, 0);        // 0 = disable , 1 = enable
+        ////set_res_raw(sensor_t *sensor, int startX, int startY, int endX, int endY, int offsetX, int offsetY, int totalX, int totalY, int outputX, int outputY, bool scale, bool binning)
+        ////  set_window(sensor, (ov2640_sensor_mode_t)startX, offsetX, offsetY, totalX, totalY, outputX, outputY);
+        ////  OV2640_MODE_CIF=2
+        ////   ox  oy  sx  sy
+        ////   80  90 150  56  @320x240
+        ////  100 111 188  69  @400x296
+        ////  100 108 188 141
+        //s->set_res_raw(s, 2, 0, 0, 0, 100, 104, 192, 72, 192, 72, false, false);
+        s->set_res_raw(s, 1, 0, 0, 0, 200, 208, 384, 144, 384, 144, false, false);
     }
     // We now have camera with default init
 }
