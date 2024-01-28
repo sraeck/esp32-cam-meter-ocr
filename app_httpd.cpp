@@ -228,6 +228,12 @@ static esp_err_t stream_handler(httpd_req_t *req){
     uint8_t * _jpg_buf = NULL;
     char * part_buf[64];
 
+    size_t min = SIZE_MAX;
+    size_t max = 0;
+    size_t avg;
+    size_t step = 0;
+    uint8_t count = 0;
+
     streamKill = false;
 
     Serial.println("Stream requested");
@@ -270,16 +276,32 @@ static esp_err_t stream_handler(httpd_req_t *req){
                 _jpg_buf = fb->buf;
             }
         }
-        if(res == ESP_OK){
-            size_t hlen = snprintf((char *)part_buf, 64, _STREAM_PART, _jpg_buf_len);
-            res = httpd_resp_send_chunk(req, (const char *)part_buf, hlen);
+
+        max -= step;
+        min += step;
+        if(_jpg_buf_len > max) max = _jpg_buf_len;
+        if(_jpg_buf_len < min) min = _jpg_buf_len;
+        avg = (max + min) >> 1;
+        step = avg >> 10;
+        if(step == 0) step = 1;
+
+        if(_jpg_buf_len > avg) {
+          if(++count == 3) {
+            if(res == ESP_OK){
+                size_t hlen = snprintf((char *)part_buf, 64, _STREAM_PART, _jpg_buf_len);
+                res = httpd_resp_send_chunk(req, (const char *)part_buf, hlen);
+            }
+            if(res == ESP_OK){
+                res = httpd_resp_send_chunk(req, (const char *)_jpg_buf, _jpg_buf_len);
+            }
+            if(res == ESP_OK){
+                res = httpd_resp_send_chunk(req, _STREAM_BOUNDARY, strlen(_STREAM_BOUNDARY));
+            }
+          }
+        } else {
+          count = 0;
         }
-        if(res == ESP_OK){
-            res = httpd_resp_send_chunk(req, (const char *)_jpg_buf, _jpg_buf_len);
-        }
-        if(res == ESP_OK){
-            res = httpd_resp_send_chunk(req, _STREAM_BOUNDARY, strlen(_STREAM_BOUNDARY));
-        }
+
         if(fb){
             esp_camera_fb_return(fb);
             fb = NULL;
